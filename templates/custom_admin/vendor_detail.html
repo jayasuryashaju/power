@@ -1,0 +1,14 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block content %}
+  <h2>{{ vendor.name }}</h2>
+  <img src="{{ vendor.image.url }}" alt="{{ vendor.name }}" width="300" height="200">
+  <!-- Add any additional details you want to display -->
+<br>
+  <a class="btn btn-primary" href="{% url 'powerenoughadmin:vendor_edit' slug=vendor.slug %}">Edit</a>
+  <a class="btn btn-secondary" href="{% url 'powerenoughadmin:vendor_list'  %}">Vendors</a>
+
+
+
+{% endblock %}

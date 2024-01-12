@@ -1,0 +1,76 @@
+{% extends "custom_admin/base.html" %}
+{% load static %}
+
+{% block title %}PowerStore Home{% endblock title %}
+
+{% block content %}
+  <div>
+    <h2>User List</h2>
+
+    <!-- Search form -->
+    <form method="get" action="{% url 'powerenoughadmin:adminhome' %}">
+      <div class="mb-3">
+        <input type="text" name="q" class="form-control" placeholder="Search by full name or email" value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div>
+    </form>
+
+    <table class="table table-bordered table-striped" id="userTable">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Full Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in user_list %}
+          <tr>
+            <td>{{ user.full_name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <a href="{% url 'powerenoughadmin:user_edit' user_id=user.user_id %}" class="btn btn-primary">Edit</a>
+              <a href="{% url 'powerenoughadmin:user_delete' user_id=user.user_id %}" class="btn btn-danger">Delete</a>
+              {% if user.is_active %}
+                <a href="{% url 'powerenoughadmin:user_deactivate' user_id=user.user_id %}" class="btn btn-warning">Deactivate</a>
+              {% else %}
+                <a href="{% url 'powerenoughadmin:user_activate' user_id=user.user_id %}" class="btn btn-success">Activate</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <span class="step-links">
+        {% if user_list.has_previous %}
+          <a href="?page=1">&laquo; first</a>
+          <a href="?page={{ user_list.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+          Page {{ user_list.number }} of {{ user_list.paginator.num_pages }}.
+        </span>
+
+        {% if user_list.has_next %}
+          <a href="?page={{ user_list.next_page_number }}">next</a>
+          <a href="?page={{ user_list.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+      </span>
+    </div>
+
+    <a href="{% url 'powerenoughadmin:user_create' %}" class="btn btn-success">Add User</a>
+  </div>
+
+  {% block datatable_scripts %}
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $('#userTable').DataTable();
+      });
+    </script>
+  {% endblock %}
+{% endblock %}

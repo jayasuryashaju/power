@@ -1,0 +1,42 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+
+{% block content %}
+  <div>
+    <h2>Vendor List</h2>
+    <a class="btn btn-primary" href="{% url "powerenoughadmin:vendor_create" %}">Create Vendor</a>
+
+    <table id="vendorTable" class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Image</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vendor in vendors %}
+          <tr>
+            <td><a href="{{ vendor.get_absolute_url }}">{{ vendor.name }}</a></td>
+            <td><img src="{{ vendor.image.url }}" width="50" height="50" alt="{{ vendor.name }}" /></td>
+            <td>
+                <a href="{% url 'powerenoughadmin:vendor_edit' slug=vendor.slug %}" class="btn btn-primary">Edit</a>
+                <a href="{% url 'powerenoughadmin:vendor_delete' slug=vendor.slug %}" class="btn btn-danger">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add this line before the DataTables script -->
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $('#vendorTable').DataTable();
+    });
+  </script>
+{% endblock %}

@@ -1,5 +1,6 @@
 {% load static %}
 
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -24,6 +25,8 @@
       href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <link href="{% static "custom_admin/style.css" %}" rel="stylesheet" >
 
   </head>
@@ -53,20 +56,20 @@
               <span class="nav_name">Dashboard</span>
             </a>
             <a href="{% url 'powerenoughadmin:user_list' %}" class="nav_link">
-              <i class="bx bx-user nav_icon"></i>
+              <i class="fa-solid fa-users"></i>
               <span class="nav_name">Users</span>
             </a>
             <a href="{% url "powerenoughadmin:vendor_list" %}" class="nav_link">
-              <i class="bx bx-message-square-detail nav_icon"></i>
+              <i class="fa-solid fa-building"></i>
               <span class="nav_name"> Vendors</span>
             </a>
-            <a href="#" class="nav_link">
-              <i class="bx bx-bookmark nav_icon"></i>
-              <span class="nav_name">Bookmark</span>
+            <a href="{% url "powerenoughadmin:category_list" %}" class="nav_link">
+              <i class="fa-solid fa-icons"></i>
+              <span class="nav_name">Categories</span>
             </a>
-            <a href="#" class="nav_link">
-              <i class="bx bx-folder nav_icon"></i>
-              <span class="nav_name">Files</span>
+            <a href="{% url "powerenoughadmin:bike_list" %}" class="nav_link">
+              <i class="fa-solid fa-motorcycle "></i>
+              <span class="nav_name">Bike</span>
             </a>
             <a href="#" class="nav_link">
               <i class="bx bx-bar-chart-alt-2 nav_icon"></i>

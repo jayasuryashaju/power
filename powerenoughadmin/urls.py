@@ -24,6 +24,29 @@ urlpatterns = [
     path('vendor/<slug:slug>/', views.vendor_detail, name='vendor_detail'),
     path('vendor/<slug:slug>/edit/', views.vendor_edit, name='vendor_edit'),
     path('vendor/<slug:slug>/delete/', views.vendor_delete, name='vendor_delete'),
+    
+    
+    
+    # ____________________________________________________- category -_______________________________________________
+    
+    
+    path('category/', views.category_list, name='category_list'),
+    path('category/create/', views.category_create, name='category_create'),
+    path('category/<slug:slug>/', views.category_detail, name='category_detail'),
+    path('category/<slug:slug>/edit/', views.category_edit, name='category_edit'),
+    path('category/<slug:slug>/delete/', views.category_delete, name='category_delete'),
+    
+    
+    # ___________________________________________________- bike -_______________________________________________________
+    
+    
+    
+    path('bike/', views.bike_list, name='bike_list'),
+    path('bike/create/', views.bike_create, name='bike_create'),
+    path('bike/<slug:slug>/edit/', views.bike_edit, name='bike_edit'),
+    path('bike/<slug:slug>/delete/', views.bike_delete, name='bike_delete'),
+    
+
 
 
 

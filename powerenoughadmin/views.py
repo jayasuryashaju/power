@@ -11,8 +11,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from .forms import CustomUserForm
 from account.models import User
-from product.models import  Vendor
-from product.forms import VendorForm
+from product.models import  Vendor, Category, Product, Bike
+from product.forms import VendorForm, CategoryForm, ProductForm, VariationForm, BikeForm
 from analytics.models import Visitor
 from django.utils import timezone
 
@@ -253,3 +253,98 @@ def vendor_delete(request, slug):
     vendor = get_object_or_404(Vendor, slug=slug)
     vendor.delete()
     return redirect('powerenoughadmin:vendor_list')
+
+
+
+# ________________________________________________________- category details - ________________________________________________________________________________
+
+
+
+
+@admin_required   
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'custom_admin/category_list.html', {'categories': categories})
+
+@admin_required 
+def category_detail(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    return render(request, 'custom_admin/category_detail.html', {'category': category})
+
+@admin_required 
+def category_create(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('powerenoughadmin:category_list')
+    else:
+        form = CategoryForm()
+    return render(request, 'custom_admin/category_form.html', {'form': form})
+
+@admin_required 
+def category_edit(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, request.FILES, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('powerenoughadmin:category_list')
+    else:
+        form = CategoryForm(instance=category)
+    return render(request, 'custom_admin/category_form.html', {'form': form, 'category': category})
+
+@admin_required 
+def category_delete(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    category.delete()
+    return redirect('powerenoughadmin:category_list')
+
+
+
+
+
+
+
+# _______________________________________________________-- bike --________________________________________________________________________________________
+
+
+
+
+@admin_required   
+def bike_list(request):
+    bikes = Bike.objects.all()
+    return render(request, 'custom_admin/bike_list.html', {'bikes': bikes})
+
+
+@admin_required 
+def bike_create(request):
+    if request.method == 'POST':
+        form = BikeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('powerenoughadmin:bike_list')
+    else:
+        form = BikeForm()
+    return render(request, 'custom_admin/bike_form.html', {'form': form})
+
+@admin_required 
+def bike_edit(request, slug):
+    bike = get_object_or_404(Bike, slug=slug)
+    if request.method == 'POST':
+        form = BikeForm(request.POST, instance=bike)
+        if form.is_valid():
+            form.save()
+            return redirect('powerenoughadmin:bike_list')
+    else:
+        form = BikeForm(instance=bike)
+    return render(request, 'custom_admin/bike_form.html', {'form': form, 'bike': bike})
+
+@admin_required 
+def bike_delete(request, slug):
+    bike = get_object_or_404(Bike, slug=slug)
+    bike.delete()
+    return redirect('powerenoughadmin:bike_list')
+
+
+

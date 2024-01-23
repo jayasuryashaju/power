@@ -28,12 +28,13 @@ SECRET_KEY = 'django-insecure-i#ru&j-n5)xp&ai%*$8uy6$!n)7e+cgehps-d8@o9)bcyh-@xm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '192.168.1.2']
+ALLOWED_HOSTS = ['localhost', '192.168.1.3', '127.0.0.1', '03e8-103-70-197-180.ngrok-free.app']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +45,6 @@ INSTALLED_APPS = [
     'store',
     'account',
     'product',
-    'django_filters',
     'analytics',
 ]
 
@@ -60,6 +60,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'powerenough.urls'
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.app_directories.load_template_source',
+)
 
 TEMPLATES = [
     {

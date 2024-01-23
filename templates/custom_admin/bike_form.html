@@ -1,0 +1,30 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block content %}
+  <h2>{% if category %}Edit{% else %}Create{% endif %} Bike</h2>
+  <form method="post" enctype="multipart/form-data" class="form form-control">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="{{ form.make.id_for_label }}">Make:</label>
+      {{ form.make }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.model.id_for_label }}">Model:</label>
+      {{ form.model }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.start_year.id_for_label }}">Start Year:</label>
+      {{ form.start_year }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.end_year.id_for_label }}">End Year:</label>
+      {{ form.end_year }}
+    </div>
+    <br> 
+    <button type="submit" class="btn btn-primary">Save changes</button>
+  </form>
+<br>
+
+  <a href="{% url 'powerenoughadmin:bike_list' %}" class="btn btn-secondary">Go Back</a>
+{% endblock %}

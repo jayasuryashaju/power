@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+{% load category_tree %}
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+<style>
+
+    .product-main-image {
+        height: 45rem;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .product-main-image img {
+        transition: transform 0.3s ease-out;
+    }
+
+    .product-image-gallery {
+        max-height: 40rem; /* Set the maximum height as needed */
+        overflow-y: auto; /* Enable the scrollbar when needed */
+        scrollbar-width: thin; /* Firefox */
+        scrollbar-color: transparent transparent; /* Firefox */
+    }
+    
+    /* Hide scrollbar for IE, Edge and Chrome */
+    .product-image-gallery::-webkit-scrollbar {
+        width: 0;
+    }
+    
+    /* Optional: scrollbar styling for Firefox */
+    .product-image-gallery::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    
+    .product-image-gallery::-webkit-scrollbar-thumb {
+        background-color: transparent;
+    }
+
+    .product-details{
+        margin-top: 5rem;
+    }
+    .product-media{
+        height: 26rem;
+        background-color: white;
+    }
+    
+    @media (max-width: 768px) {
+        
+        .product-image-gallery {
+            display: flex;
+            flex-direction: column;
+            max-height: 12rem; /* Set the maximum height as needed */
+            overflow-x: auto; /* Enable the scrollbar when needed */
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: transparent transparent; /* Firefox */
+        }
+        
+        /* Hide scrollbar for IE, Edge and Chrome */
+        .product-image-gallery::-webkit-scrollbar {
+            width: 0;
+        }
+        
+        /* Optional: scrollbar styling for Firefox */
+        .product-image-gallery::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+        
+        .product-image-gallery::-webkit-scrollbar-thumb {
+            background-color: transparent;
+        }
+
+        .product-details{
+            margin-top: 0;
+        }
+
+        .product-media{
+            height: 18rem;
+            background-color: white;
+        }
+  
+        
+      }
+
+</style>
+
+<main class="main">
+    <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+        <div class="container d-flex align-items-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url "store:homepage" %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    {% category_tree product.category separator=" > " %}
+
+                </li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+
+    <div class="page-content">
+        <div class="container">
+            <div class="product-details-top mb-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="product-gallery product-gallery-vertical">
+                            <div class="row">
+                                {% for image in product.images.all  %}
+                                {% if image.is_featured %}
+                                <figure class="product-main-image">
+                                    <img id="product-zoom" src="{{ image.image.url }}" data-zoom-image="{{ image.image.url }}" alt="{{ image.alt_text }}" >
+                                </figure><!-- End .product-main-image -->
+
+                                {% endif %}
+
+                                {% endfor %}
+                                
+                                <div id="product-zoom-gallery" class="product-image-gallery">
+                                    {% for image in product.images.all  %}
+                                    <a class="product-gallery-item " data-image="{{ image.image.url }}">
+                                        <img src="{{ image.image.url }}" alt="{{ image.alt_text }}">
+                                    </a>
+                                    {% endfor %}
+
+                                </div><!-- End .product-image-gallery -->
+
+                            </div><!-- End .row -->
+                        </div><!-- End .product-gallery -->
+                    </div><!-- End .col-md-6 -->
+
+                    <div class="col-md-6 ">
+                        <div class="product-details product-details-centered">
+                            <h1 class="product-title" style="font-weight: bold;">{{ product.name }}</h1><!-- End .product-title -->
+
+                            <div class="product-price" id="product-price">
+                                ${{ product.price }}
+                            </div><!-- End .product-price -->
+
+                            <div class="product-content">
+                                <p>{{ product.details }}</p>
+                            </div><!-- End .product-content -->
+
+                            <div class="details-filter-row details-row-size">
+                                <label for="size">Size:</label>
+                                <div class="select-custom">
+                                    <form id="variation-form">
+                                        {% csrf_token %}
+                                        <select name="size" id="size" class="form-control">
+                                            {% for variation in variations %}
+                                                <option value="{{ variation.size }}" data-price="{{ variation.price }}" {% if variation.has_offer %}data-offer="true" data-offer-price="{{ variation.offer_price }}"{% endif %}>
+                                                    {{ variation.size }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </form>
+                                </div><!-- End .select-custom -->
+
+                                <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a>
+                            </div><!-- End .details-filter-row -->
+
+                            <div class="product-details-action">
+                                <div class="details-action-col">
+                                    <div class="product-details-quantity">
+                                        <input type="number" id="qty" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required>
+                                    </div><!-- End .product-details-quantity -->
+
+                                    <a href="#" class="btn btn-primary btn-round"><i class="fa-brands fa-whatsapp fa-xl m-2"></i> Buy it on Whatsapp</a>
+                                </div><!-- End .details-action-col -->
+
+                                <div class="details-action-wrapper">
+                                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                                </div><!-- End .details-action-wrapper -->
+                            </div><!-- End .product-details-action -->
+
+                            <div class="product-details-footer">
+                                <div class="product-cat">
+                                    <span>Category:</span>
+                                    {% comment %} <a href="{{ product.category.get_absolute_url }}">{% category_tree product.category separator=" > " %}</a> {% endcomment %}
+                                    {% category_tree product.category  %}
+
+                                </div><!-- End .product-cat -->
+                            </div><!-- End .product-details-footer -->
+                        </div><!-- End .product-details -->
+                    </div><!-- End .col-md-6 -->
+                </div><!-- End .row -->
+            </div><!-- End .product-details-top -->
+
+            <div class="product-details-tab">
+                <ul class="nav nav-pills justify-content-center" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="product-desc-link" data-toggle="tab" href="#product-desc-tab" role="tab" aria-controls="product-desc-tab" aria-selected="true">Description</a>
+                    </li>
+                    {% if product.additional_description %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="product-info-link" data-toggle="tab" href="#product-info-tab" role="tab" aria-controls="product-info-tab" aria-selected="false">Additional information</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="product-shipping-link" data-toggle="tab" href="#product-shipping-tab" role="tab" aria-controls="product-shipping-tab" aria-selected="false">Shipping & Returns</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
+                        <div class="product-desc-content">
+                            <h3>Product Information</h3>
+                            <p>{{ product.description }}</p>
+                            
+
+                        </div><!-- End .product-desc-content -->
+                    </div><!-- .End .tab-pane -->
+                    {% if product.additional_description %}
+
+                    <div class="tab-pane fade" id="product-info-tab" role="tabpanel" aria-labelledby="product-info-link">
+                        <div class="product-desc-content">
+                            <h3>Information</h3>
+                            <p>{{ product.additional_description }}</p>
+                        </div><!-- End .product-desc-content -->
+                    </div><!-- .End .tab-pane -->
+                    {% endif %}
+
+                    <div class="tab-pane fade" id="product-shipping-tab" role="tabpanel" aria-labelledby="product-shipping-link">
+                        <div class="product-desc-content">
+                            <h3>Delivery & returns</h3>
+                            <p>We deliver to over 100 countries around the world. For full details of the delivery options we offer, please view our <a href="#">Delivery information</a><br>
+                            We hope you’ll love every purchase, but if you ever need to return an item you can do so within a month of receipt. For full details of how to make a return, please view our <a href="#">Returns information</a></p>
+                        </div><!-- End .product-desc-content -->
+                    </div><!-- .End .tab-pane -->
+                    <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
+                        <div class="reviews">
+                            <h3>Reviews (2)</h3>
+                            <div class="review">
+                                <div class="row no-gutters">
+                                    <div class="col-auto">
+                                        <h4><a href="#">Samanta J.</a></h4>
+                                        <div class="ratings-container">
+                                            <div class="ratings">
+                                                <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
+                                            </div><!-- End .ratings -->
+                                        </div><!-- End .rating-container -->
+                                        <span class="review-date">6 days ago</span>
+                                    </div><!-- End .col -->
+                                    <div class="col">
+                                        <h4>Good, perfect size</h4>
+
+                                        <div class="review-content">
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus cum dolores assumenda asperiores facilis porro reprehenderit animi culpa atque blanditiis commodi perspiciatis doloremque, possimus, explicabo, autem fugit beatae quae voluptas!</p>
+                                        </div><!-- End .review-content -->
+
+                                        <div class="review-action">
+                                            <a href="#"><i class="icon-thumbs-up"></i>Helpful (2)</a>
+                                            <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
+                                        </div><!-- End .review-action -->
+                                    </div><!-- End .col-auto -->
+                                </div><!-- End .row -->
+                            </div><!-- End .review -->
+
+                            <div class="review">
+                                <div class="row no-gutters">
+                                    <div class="col-auto">
+                                        <h4><a href="#">John Doe</a></h4>
+                                        <div class="ratings-container">
+                                            <div class="ratings">
+                                                <div class="ratings-val" style="width: 100%;"></div><!-- End .ratings-val -->
+                                            </div><!-- End .ratings -->
+                                        </div><!-- End .rating-container -->
+                                        <span class="review-date">5 days ago</span>
+                                    </div><!-- End .col -->
+                                    <div class="col">
+                                        <h4>Very good</h4>
+
+                                        <div class="review-content">
+                                            <p>Sed, molestias, tempore? Ex dolor esse iure hic veniam laborum blanditiis laudantium iste amet. Cum non voluptate eos enim, ab cumque nam, modi, quas iure illum repellendus, blanditiis perspiciatis beatae!</p>
+                                        </div><!-- End .review-content -->
+
+                                        <div class="review-action">
+                                            <a href="#"><i class="icon-thumbs-up"></i>Helpful (0)</a>
+                                            <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
+                                        </div><!-- End .review-action -->
+                                    </div><!-- End .col-auto -->
+                                </div><!-- End .row -->
+                            </div><!-- End .review -->
+                        </div><!-- End .reviews -->
+                    </div><!-- .End .tab-pane -->
+                </div><!-- End .tab-content -->
+            </div><!-- End .product-details-tab -->
+
+            <h2 class="title text-center mb-4">You May Also Like</h2><!-- End .title text-center -->
+            <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+                data-owl-options='{
+                    "nav": false, 
+                    "dots": true,
+                    "margin": 20,
+                    "loop": false,
+                    "responsive": {
+                        "0": {
+                            "items":1
+                        },
+                        "480": {
+                            "items":2
+                        },
+                        "768": {
+                            "items":3
+                        },
+                        "992": {
+                            "items":4
+                        },
+                        "1200": {
+                            "items":4,
+                            "nav": true,
+                            "dots": false
+                        }
+                    }
+                }'>
+
+                {% for product in related_products %}
+                <div class="product product-7 text-center">
+                    <figure class="product-media">
+                        <span class="product-label label-new">New</span>
+                        <a href="{{ product.get_absolute_url }}" >
+                            {% for image in product.images.all  %}
+                            {% if image.is_featured %}
+                            <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="product-image" style="background-color: white;">
+                            {% endif %}
+                            {% endfor %}
+                        </a>
+
+                        <div class="product-action-vertical">
+                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                        </div><!-- End .product-action-vertical -->
+
+                        <div class="product-action">
+                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                        </div><!-- End .product-action -->
+                    </figure><!-- End .product-media -->
+
+                    <div class="product-body">
+                        <div class="product-cat">
+                            <a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a>
+                        </div><!-- End .product-cat -->
+                        <h3 class="product-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3><!-- End .product-title -->
+                        
+                        {% if product.variations.all %}
+                            <div class="product-price">
+                                {% if product.variations.first.has_offer %}
+                                    <span class="old-price">${{ product.variations.first.price }}</span>
+                                    <span class="new-price">${{ product.variations.first.offer_price }}</span>
+                                    
+                                {% else %}
+                                    <span>${{ product.variations.first.price }}</span>
+                                {% endif %}
+                            </div><!-- End .product-price -->
+                        {% endif %}
+                    </div><!-- End .product-body -->
+                </div><!-- End .product -->
+                {% endfor %}
+    
+            </div><!-- End .owl-carousel -->
+        </div><!-- End .container -->
+    </div><!-- End .page-content -->
+</main><!-- End .main -->
+
+
+
+<script>
+    document.getElementById('size').addEventListener('change', function () {
+        var selectedSize = this.value;
+        var selectedOption = this.options[this.selectedIndex];
+        var hasOffer = selectedOption.getAttribute('data-offer') === 'true';
+
+        // Update the displayed prices
+        var productPriceElement = document.getElementById('product-price');
+        if (hasOffer) {
+            var newPrice = selectedOption.getAttribute('data-offer-price');
+            var oldPrice = selectedOption.getAttribute('data-price');
+            productPriceElement.innerHTML = `<span class="new-price">$${newPrice}</span><span class="old-price">$${oldPrice}</span>`;
+        } else {
+            var price = selectedOption.getAttribute('data-price');
+            productPriceElement.innerHTML = '$' + price;
+        }
+    });
+
+    // Trigger the change event on page load
+    document.getElementById('size').dispatchEvent(new Event('change'));
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var mainImage = document.getElementById('product-zoom');
+        var galleryItems = document.querySelectorAll('.product-gallery-item');
+    
+        galleryItems.forEach(function (item) {
+            item.addEventListener('click', function () {
+                var newImageSrc = this.getAttribute('data-image');
+                mainImage.src = newImageSrc;
+            });
+        });
+    });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var zoomContainer = document.querySelector('.product-main-image');
+            var productZoom = document.getElementById('product-zoom');
+    
+            zoomContainer.addEventListener('mousemove', function (e) {
+                var rect = this.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+    
+                var xPercent = (x / this.offsetWidth) * 100;
+                var yPercent = (y / this.offsetHeight) * 100;
+    
+                productZoom.style.transformOrigin = xPercent + '% ' + yPercent + '%';
+                productZoom.style.transform = 'scale(2)'; // Adjust the scale factor as needed
+            });
+    
+            zoomContainer.addEventListener('mouseleave', function () {
+                productZoom.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+    
+
+{% endblock content %}

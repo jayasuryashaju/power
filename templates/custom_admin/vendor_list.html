@@ -19,7 +19,9 @@
         {% for vendor in vendors %}
           <tr>
             <td><a href="{{ vendor.get_absolute_url }}">{{ vendor.name }}</a></td>
+            {% if vendor.image %}
             <td><img src="{{ vendor.image.url }}" width="50" height="50" alt="{{ vendor.name }}" /></td>
+            {% endif %}
             <td>
                 <a href="{% url 'powerenoughadmin:vendor_edit' slug=vendor.slug %}" class="btn btn-primary">Edit</a>
                 <a href="{% url 'powerenoughadmin:vendor_delete' slug=vendor.slug %}" class="btn btn-danger">Delete</a>

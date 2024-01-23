@@ -3,7 +3,9 @@
 
 {% block content %}
   <h2>{{ vendor.name }}</h2>
+  {% if vendor.image %}
   <img src="{{ vendor.image.url }}" alt="{{ vendor.name }}" width="300" height="200">
+  {% endif %}
   <!-- Add any additional details you want to display -->
 <br>
   <a class="btn btn-primary" href="{% url 'powerenoughadmin:vendor_edit' slug=vendor.slug %}">Edit</a>

@@ -1,0 +1,47 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block content %}
+  <h2>Import Products from CSV</h2>
+  <form id="import-csv-form" method="post" enctype="multipart/form-data" class="form form-control">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+    
+    <button type="submit" class="btn btn-primary">Import Products</button>
+  </form>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#import-csv-form').submit(function(e) {
+        e.preventDefault(); // Prevent the default form submission
+        
+        // Serialize form data
+        var formData = new FormData($(this)[0]);
+        
+        // Send AJAX request
+        $.ajax({
+          type: 'POST',
+          url: '{% url "powerenoughadmin:import_products" %}',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(data) {
+            // Parse JSON response
+            if (data.success) {
+              // Show success message
+              alert(data.message);
+            } else {
+              // Show error message
+              alert(data.error);
+            }
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            console.error('Error:', errorThrown);
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}

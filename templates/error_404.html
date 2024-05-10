@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>404 - Page Not Found</title>
+</head>
+<body>
+
+<style>
+  /* Space theme and animation styles */
+  body {
+    background-image: url("https://images3.alphacoders.com/201/201447.jpg"); /* Replace with your space image */
+    background-size: cover;
+    background-color: #000; /* Fallback for image loading */
+    font-family: sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    position: relative; /* Ensure stars are positioned within body */
+  }
+
+  .space-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .error-message {
+    color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  h1 {
+    font-size: 60px;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  a {
+    background-color: #222;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .space-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Prevent stars from overflowing body */
+  }
+
+  .star {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center stars within container */
+    width: 5px;
+    height: 5px;
+    background-color: #fff;
+    animation: twinkle 2s infinite ease-in-out;
+  }
+
+  @keyframes twinkle {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+
+  /* Additional animations */
+  @keyframes drift-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-200px); }
+  }
+
+  .drifting-star {
+    animation: drift-left 10s linear infinite;
+  }
+</style>
+
+<div class="space-container">
+  <div class="error-message">
+    <h1>404</h1>
+    <h2>Page Not Found</h2>
+    <p>It seems you've stumbled into a black hole. The page you're looking for has drifted off into deep space.</p>
+    <a href="{% url 'user-list' %}">Go Home</a>
+  </div>
+  <div class="space-animation">
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star drifting-star"></div>
+    <div class="star drifting-star"></div>
+  </div>
+</div>
+
+</body>
+</html>

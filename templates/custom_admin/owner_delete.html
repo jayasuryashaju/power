@@ -1,0 +1,17 @@
+{% extends "custom_admin/base.html" %}
+{% load static %}
+
+{% block content %}
+  
+<body>
+
+    
+    <h1>Delete Owner</h1>
+    <p>Are you sure you want to delete owner "{{ owner.email }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+    </form>
+    <a href="{% url 'powerenoughadmin:owner_list' %}">Cancel</a>
+
+{% endblock %}

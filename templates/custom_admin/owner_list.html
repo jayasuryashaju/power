@@ -1,0 +1,15 @@
+{% extends "custom_admin/base.html" %}
+{% load static %}
+
+{% block content %}
+  
+<body>
+    <h1>Owner List</h1>
+    <ul>
+        {% for owner in owners %}
+            <li><a href="{% url 'powerenoughadmin:owner_detail' owner.id %}">{{ owner.email }}</a></li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'powerenoughadmin:owner_add' %}">Add Owner</a>
+
+{% endblock %}

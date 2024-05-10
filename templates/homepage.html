@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Welcome to Your E-commerce Store</h2>
+
+    {% if user_data %}
+        <p>Hello, {{ user_data.full_name }}!</p>
+        <p>Email: {{ user_data.email }}</p>
+        <p>Phone Number: {{ user_data.phone_number }}</p>
+        <a href="{% url 'user:signout' %}" class="btn btn-danger">Logout</a>
+    {% else %}
+        <p>You are not logged in.</p>
+        <a href="{% url 'user:signin' %}" class="btn btn-primary">Sign In</a>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "custom_admin/base.html" %}
+{% block content %}
+  <h2>Homepage</h2>
+
+<h3>Add Products from CSV</h3>
+
+  <a href="{% url 'powerenoughadmin:import_products' %}" class="btn btn-primary">Import Products</a>
+
+
+  
+
+  <canvas id="visitChart" width="400" height="200"></canvas>
+  
+  <!-- Include Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    var ctx = document.getElementById('visitChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ dates|safe }},
+        datasets: [{
+          label: 'Visit Count',
+          data: {{ visit_counts|safe }},
+          borderWidth: 1,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        }]
+      },
+    });
+  </script>
+{% endblock %}

@@ -15,7 +15,11 @@ venv/
 *.log
 
 #Ignore media files
-.media/
+media/
 
 # Ignore cache files
 __pycache__/
+
+# Ignore all migration files
+**/migrations/*.py
+**/migrations/*.pyc

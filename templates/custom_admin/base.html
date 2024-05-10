@@ -51,9 +51,13 @@
             />
           </a>
           <div class="nav_list">
-            <a href="#" class="nav_link active">
+            <a href="{% url 'powerenoughadmin:adminhome' %}" class="nav_link active">
               <i class="bx bx-grid-alt nav_icon"></i>
               <span class="nav_name">Dashboard</span>
+            </a>
+            <a href="{% url 'powerenoughadmin:owner_list' %}" class="nav_link">
+              <i class="bx bx-bar-chart-alt-2 nav_icon"></i>
+              <span class="nav_name">Owner (Site Logo/ Social Links)</span>
             </a>
             <a href="{% url 'powerenoughadmin:user_list' %}" class="nav_link">
               <i class="fa-solid fa-users"></i>
@@ -71,10 +75,7 @@
               <i class="fa-solid fa-motorcycle "></i>
               <span class="nav_name">Bike</span>
             </a>
-            <a href="#" class="nav_link">
-              <i class="bx bx-bar-chart-alt-2 nav_icon"></i>
-              <span class="nav_name">Stats</span>
-            </a>
+            
           </div>
         </div>
         {% if user.is_authenticated %}

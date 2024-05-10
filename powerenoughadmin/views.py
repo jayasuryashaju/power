@@ -9,12 +9,25 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseServerError, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from .forms import CustomUserForm
+from .forms import CustomUserForm, OwnerForm
+from .models import Owner
 from account.models import User
-from product.models import  Vendor, Category, Product, Bike
+from product.models import  Vendor, Category, Product, Bike, Variation, ProductImage
 from product.forms import VendorForm, CategoryForm, ProductForm, VariationForm, BikeForm
 from analytics.models import Visitor
 from django.utils import timezone
+import pandas as pd
+from urllib.request import urlretrieve
+from .forms import ImportCSVForm
+from django.http import JsonResponse
+from django.core.files import File
+from urllib.request import urlretrieve
+from io import BytesIO
+import os
+from django.db.utils import IntegrityError
+from urllib.error import URLError
+
+
 
 
 
@@ -24,7 +37,8 @@ def increment_daily_visit_count():
     visitor, created = Visitor.objects.get_or_create(date=today)
     visitor.visit_count += 1
     visitor.save()
-
+    
+@admin_required
 def adminhome(request):
     template_name = 'custom_admin/index.html'
 
@@ -39,6 +53,43 @@ def adminhome(request):
     visit_counts = [visitor.visit_count for visitor in visitors]
 
     return render(request, template_name, {'dates': dates, 'visit_counts': visit_counts})
+
+
+def owner_list(request):
+    owners = Owner.objects.all()
+    return render(request, 'custom_admin/owner_list.html', {'owners': owners})
+
+def owner_details(request, owner_id):
+    owner = get_object_or_404(Owner, pk=owner_id)
+    return render(request, 'custom_admin/owner_detail.html', {'owner': owner})
+
+def owner_add(request):
+    if request.method == 'POST':
+        form = OwnerForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('powerenoughadmin:owner_list')
+    else:
+        form = OwnerForm()
+    return render(request, 'custom_admin/owner_add.html', {'form': form})
+
+def owner_edit(request, owner_id):
+    owner = get_object_or_404(Owner, pk=owner_id)
+    if request.method == 'POST':
+        form = OwnerForm(request.POST, request.FILES, instance=owner)
+        if form.is_valid():
+            form.save()
+            return redirect('powerenoughadmin:owner_detail', owner_id=owner_id)
+    else:
+        form = OwnerForm(instance=owner)
+    return render(request, 'custom_admin/owner_edit.html', {'form': form})
+
+def owner_delete(request, owner_id):
+    owner = get_object_or_404(Owner, pk=owner_id)
+    if request.method == 'POST':
+        owner.delete()
+        return redirect('powerenoughadmin:owner_list')
+    return render(request, 'custom_admin/owner_delete.html', {'owner': owner})
     
    
 
@@ -322,10 +373,12 @@ def bike_create(request):
     if request.method == 'POST':
         form = BikeForm(request.POST)
         if form.is_valid():
+            print("create bike function is working fine")
             form.save()
             return redirect('powerenoughadmin:bike_list')
     else:
         form = BikeForm()
+        print(form)
     return render(request, 'custom_admin/bike_form.html', {'form': form})
 
 @admin_required 
@@ -348,3 +401,131 @@ def bike_delete(request, slug):
 
 
 
+
+#--------------------------------------------------- import-----------------------------------------------------
+
+
+def download_image(image_url):
+    try:
+        # Download the image from the URL
+        filename, headers = urlretrieve(image_url)
+        with open(filename, 'rb') as file:
+            image_content = BytesIO(file.read())
+
+        # Get the filename from the URL
+        filename = os.path.basename(image_url)
+
+        # Create a Django File object from the image content
+        image_file = File(image_content, name=filename)
+
+        return image_file
+
+    except (URLError, FileNotFoundError) as e:
+        # Handle errors during image download
+        print(f"Error downloading image from {image_url}: {e}")
+        return None
+    
+
+def import_products(request):
+    if request.method == 'POST':
+        form = ImportCSVForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES['csv_file']
+            df = pd.read_csv(csv_file)
+
+            for index, row in df.iterrows():
+                if not pd.isna(row['Product Name']):  # Skip rows where 'Product Name' is NaN
+                    try:
+                        # Check if the vendor exists, if not create it
+                        vendor_name = row['Vendor']
+                        vendor, created = Vendor.objects.get_or_create(name=vendor_name)
+
+                        # Check if the category exists, if not create it
+                        category_name = row['Category']
+                        category, created = Category.objects.get_or_create(name=category_name)
+
+                        # # Handle NaN values in prices
+                        # new_price = row['New Price']
+                        # old_price = row['Old Price']
+                        # if pd.isna(new_price) and pd.isna(old_price):
+                        #     price = 0.00
+                        #     has_offer = False
+                        #     offer_price = None
+                        # else:
+                        #     if pd.notna(old_price):
+                        #         price = old_price
+                        #         if pd.notna(new_price):
+                        #             has_offer = True
+                        #             offer_price = new_price
+                        #         else:
+                        #             has_offer = False
+                        #             offer_price = None
+                        #     else:
+                        #         price = new_price
+                        #         has_offer = False
+                        #         offer_price = None
+                        price = 100
+                        has_offer = False
+                        offer_price = None
+
+                        # Create the product
+                        product = Product.objects.create(
+                            name=row['Product Name'],
+                            category=category,
+                            vendor=vendor,
+                            description=row['Description'],
+                            # additional_description=row['Additional Description'],
+                            price=price,
+                            has_offer=has_offer,
+                            offer_price=offer_price
+                        )
+
+                        # Download and associate images
+                        images = eval(row['Images'])  # Convert string representation to list
+                        is_first_image = True  # Flag to track the first image
+                        for i, image_url in enumerate(images):
+                            # Download the image and create a File object
+                            image_file = download_image(image_url)
+
+                            if image_file is not None:
+                                # Set is_featured to True for the first image
+                                is_featured = is_first_image
+                                is_first_image = False
+
+                                # Create a ProductImage object
+                                product_image = ProductImage.objects.create(
+                                    product=product,
+                                    image=image_file,  # Pass the File object to the image field
+                                    is_featured=is_featured  # Set is_featured field
+                                    # Add more fields as needed
+                                )
+                            else:
+                                # Skip this image and continue to the next one
+                                continue
+
+                        # Add variations
+                        variations = []
+                        if 'Sizes SKUs' in row:
+                            sizes_skus_data = eval(row['Sizes SKUs'])  # Assuming 'Sizes SKUs' column contains variation data
+                            for size, sku in sizes_skus_data.items():
+                                variation = Variation(
+                                    product=product,
+                                    size=size,
+                                    sku=sku,
+                                    stock=10  # Set initial stock, adjust as needed
+                                    # Add more variation fields as needed
+                                )
+                                variations.append(variation)
+                        Variation.objects.bulk_create(variations)
+
+                        # After adding each product, you can print a message
+                        print(f"Product {row['Product Name']} added successfully")
+
+                    except IntegrityError:
+                        # Handle the case where a product with the same name already exists
+                        print(f"Product {row['Product Name']} already exists. Skipping...")
+
+            return JsonResponse({'success': True, 'message': 'Products added successfully'})
+    else:
+        form = ImportCSVForm()
+    return render(request, 'custom_admin/import_products.html', {'form': form})

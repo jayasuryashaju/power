@@ -9,27 +9,32 @@
 
     <table id="vendorTable" class="table">
       <thead>
-        <tr>
-          <th>Name</th>
-          <th>Image</th>
-          <th>Actions</th>
-        </tr>
+          <tr>
+              <th>Name</th>
+              <th>Image</th>
+              <th>Actions</th>
+          </tr>
       </thead>
       <tbody>
-        {% for vendor in vendors %}
+          {% for vendor in vendors %}
           <tr>
-            <td><a href="{{ vendor.get_absolute_url }}">{{ vendor.name }}</a></td>
-            {% if vendor.image %}
-            <td><img src="{{ vendor.image.url }}" width="50" height="50" alt="{{ vendor.name }}" /></td>
-            {% endif %}
-            <td>
-                <a href="{% url 'powerenoughadmin:vendor_edit' slug=vendor.slug %}" class="btn btn-primary">Edit</a>
-                <a href="{% url 'powerenoughadmin:vendor_delete' slug=vendor.slug %}" class="btn btn-danger">Delete</a>
-            </td>
+              <td><a href="{{ vendor.get_absolute_url }}">{{ vendor.name }}</a></td>
+              <td>
+                  {% if vendor.image %}
+                  <img src="{{ vendor.image.url }}" width="50" height="50" alt="{{ vendor.name }}" />
+                  {% else %}
+                  <img src="{% static 'images/placeholder.jpg' %}" width="50" height="50" alt="No Image" />
+                  {% endif %}
+              </td>
+              <td>
+                  <a href="{% url 'powerenoughadmin:vendor_edit' slug=vendor.slug %}" class="btn btn-primary">Edit</a>
+                  <a href="{% url 'powerenoughadmin:vendor_delete' slug=vendor.slug %}" class="btn btn-danger">Delete</a>
+              </td>
           </tr>
-        {% endfor %}
+          {% endfor %}
       </tbody>
-    </table>
+  </table>
+  
   </div>
 
   <!-- Add this line before the DataTables script -->

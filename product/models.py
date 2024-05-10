@@ -1,22 +1,20 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext as _
+from account.models import User
 import os
 import uuid
-from django.contrib.contenttypes.fields import GenericRelation
 
 
 
 
 def generate_unique_filename(instance, filename):
-
     ext = os.path.splitext(filename)[1]  # Extract the file extension
-    filename_base = f"{uuid.uuid4().hex}"  # Generate a unique base using UUID
+    filename_base = uuid.uuid4().hex  # Generate a unique base using UUID
     unique_filename = f"{filename_base}{ext}"  # Combine with extension
-
     return os.path.join(instance.__class__.__name__.lower(), unique_filename)
-
 
 
 class Vendor(models.Model):
@@ -43,8 +41,6 @@ class Vendor(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
-
-
 
 class Category(models.Model):
     LIVE=1
@@ -74,10 +70,7 @@ class Category(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
-        
-
-    
-    
+          
 class Bike(models.Model):
     LIVE=1
     DELETE=0
@@ -97,10 +90,7 @@ class Bike(models.Model):
  
     def __str__(self):
         return f"{self.make} {self.model} {self.start_year}-{self.end_year}"
-        
-        
-        
-        
+               
 class Product(models.Model):
     LIVE=1
     DELETE=0
@@ -110,8 +100,12 @@ class Product(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, blank=True)
     bikes = models.ManyToManyField(Bike, related_name='products', blank=True)
     is_featured = models.BooleanField(default=False)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    has_offer = models.BooleanField(default=False)
+    offer_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     description = models.TextField(blank=True)
     additional_description = models.TextField(blank=True)
+    view_count = models.IntegerField(default=0)
     delete_status = models.IntegerField(choices=DELETE_CHOICES, default=LIVE)
     slug = models.SlugField(unique=True, max_length=255, editable=False)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -126,6 +120,10 @@ class Product(models.Model):
     
     def get_absolute_url(self):
         return reverse('store:product_details', args=[self.slug])
+    
+    def increment_views(self):
+        self.view_count += 1
+        self.save()
     
     def get_related_products(self, num_related=10):
         """
@@ -146,26 +144,34 @@ class Product(models.Model):
         self.slug = slugify(self.name)  
         super().save(*args, **kwargs)
         
-class ProductImage(models.Model):
     
+        
+class ProductImage(models.Model):
     image = models.ImageField(upload_to=generate_unique_filename)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', default=None)  
     alt_text = models.CharField(max_length=255, blank=True)
     is_featured = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-        
+    
+    def save(self, *args, **kwargs):
+        if not self.alt_text:
+            # Generate alt text using product name and image filename
+            product_name = slugify(self.product.name)
+            image_name = os.path.splitext(os.path.basename(self.image.name))[0]
+            alt_text = f"{product_name} - Image {self.pk} - {image_name}"
+            self.alt_text = alt_text.capitalize()  # Capitalize first letter
+        super().save(*args, **kwargs)
+    
+            
 class Variation(models.Model):
     
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variations', default=None)
     variant_details = models.TextField(blank=True)
     size = models.CharField(max_length=255, null=True, blank=True)
     color = models.CharField(max_length=255,null=True, blank=True)  
-    sku = models.CharField(max_length=255, unique=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    sku = models.CharField(max_length=255, unique=False, blank=True)
     stock = models.PositiveIntegerField(default=0)
-    has_offer = models.BooleanField(default=False)
-    offer_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     
@@ -174,5 +180,23 @@ class Variation(models.Model):
         verbose_name_plural = _("Variations")
 
     def __str__(self):
-        return f"{self.product.name} - {self.sku} ({self.size}, {self.color}) - ${self.price:.2f}"
+        return f"{self.product.name} - {self.sku} ({self.size}, {self.color})"
+    
+class Review(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField()
+    date_posted = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Review")
+        verbose_name_plural = _("Reviews")
+
+    def __str__(self):
+        if self.user:
+            return f"Review by {self.user.username} for {self.product.name}"
+        else:
+            return f"Anonymous Review for {self.product.name}"
+
         

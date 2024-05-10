@@ -1,0 +1,74 @@
+{% extends "custom_admin/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Owner Detail</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>Email</th>
+                                <td>{{ owner.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>Address</th>
+                                <td>{{ owner.address }}</td>
+                            </tr>
+                            <tr>
+                                <th>City</th>
+                                <td>{{ owner.city }}</td>
+                            </tr>
+                            <tr>
+                                <th>Country</th>
+                                <td>{{ owner.country }}</td>
+                            </tr>
+                            <tr>
+                                <th>Favicon</th>
+                                <td><img src="{{ owner.favicon.url }}" alt="Favicon" width="50"></td>
+                            </tr>
+                            <tr>
+                                <th>Website Logo</th>
+                                <td><img src="{{ owner.website_logo.url }}" alt="Website Logo" width="100"></td>
+                            </tr>
+                            <tr>
+                                <th>Footer Logo</th>
+                                <td><img src="{{ owner.footer_logo.url }}" alt="Footer Logo" width="100"></td>
+                            </tr>
+                            <tr>
+                                <th>WhatsApp</th>
+                                <td>{{ owner.whatsapp }}</td>
+                            </tr>
+                            <tr>
+                                <th>Instagram</th>
+                                <td>{{ owner.instagram }}</td>
+                            </tr>
+                            <tr>
+                                <th>YouTube</th>
+                                <td>{{ owner.youtube }}</td>
+                            </tr>
+                            <tr>
+                                <th>Twitter</th>
+                                <td>{{ owner.twitter }}</td>
+                            </tr>
+                            <tr>
+                                <th>Phone Number</th>
+                                <td>{{ owner.phone_number }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'powerenoughadmin:owner_edit' owner.id %}" class="btn btn-primary">Edit</a>
+                        <a href="{% url 'powerenoughadmin:owner_list' %}" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

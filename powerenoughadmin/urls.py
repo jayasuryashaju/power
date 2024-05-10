@@ -8,6 +8,14 @@ urlpatterns = [
     path('login/', views.custom_login, name='login'),
     path('logout/', views.custom_logout, name='logout'),
     
+    # __________________________________________----------- Owner ----___________________________________---
+    
+    path('owners/', views.owner_list, name='owner_list'),
+    path('owners/add/', views.owner_add, name='owner_add'),
+    path('owners/<int:owner_id>/', views.owner_details, name='owner_detail'),
+    path('owners/<int:owner_id>/edit/', views.owner_edit, name='owner_edit'),
+    path('owners/<int:owner_id>/delete/', views.owner_delete, name='owner_delete'),
+    
     
     path('user_create/', views.user_create, name='user_create'),
     path('user_list/', views.user_list, name='user_list'),
@@ -45,6 +53,11 @@ urlpatterns = [
     path('bike/create/', views.bike_create, name='bike_create'),
     path('bike/<slug:slug>/edit/', views.bike_edit, name='bike_edit'),
     path('bike/<slug:slug>/delete/', views.bike_delete, name='bike_delete'),
+    
+    
+    # ________________________________________________________--import--__________________________________________________________
+    
+    path('import/', views.import_products, name='import_products'),
     
 
 

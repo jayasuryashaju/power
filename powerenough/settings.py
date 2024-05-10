@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-i#ru&j-n5)xp&ai%*$8uy6$!n)7e+cgehps-d8@o9)bcyh-@xm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '192.168.1.3', '127.0.0.1', '03e8-103-70-197-180.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', '192.168.1.5', '127.0.0.1', '2761-103-70-197-152.ngrok-free.app']
 
 
 # Application definition
@@ -76,6 +76,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'store.context_processors.add_user_data_to_context',
             ],
         },
     },

@@ -47,16 +47,17 @@ admin.site.register(Bike)
 
 class VariationInline(admin.StackedInline):
     model = Variation
-    extra = 1  #
-class ProductImageInline(admin.StackedInline):
+    extra = 1
+
+class CustomProductImageInline(admin.StackedInline):
     model = ProductImage
-    extra = 1  
-    
+    extra = 1
+    fields = ['image', 'is_featured']
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'vendor')
     readonly_fields = ('slug',)
-    inlines = [VariationInline, ProductImageInline]
+    inlines = [VariationInline, CustomProductImageInline]  # Use the custom inline here
 
 admin.site.register(Product, ProductAdmin)
  

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Vendor, Category, Product, Variation, Bike
+from .models import Vendor, Category, Product, Variation, Bike, Review
 from django.contrib import admin
 
 
@@ -44,5 +44,10 @@ class VariationForm(forms.ModelForm):
     class Meta:
         model = Variation
         fields = '__all__'
+        
+# class ReviewForm(forms.ModelForm):
+#     class Meta:
+#         model = Review
+#         fields = ['content', 'rating']
 
 

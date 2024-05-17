@@ -517,15 +517,7 @@ def import_products(request):
 
                         images = eval(row['Images']) if 'Images' in row and row['Images'] else []
                         if not images:
-                            dummy_image_path = os.path.join('static', 'images', 'dummy_helmet.jpg')
-                            with open(dummy_image_path, 'rb') as dummy_file:
-                                dummy_image_content = BytesIO(dummy_file.read())
-                                dummy_image_file = File(dummy_image_content, name='dummy_helmet.jpg')
-                                ProductImage.objects.create(
-                                    product=product,
-                                    image=dummy_image_file,
-                                    is_featured=True
-                                )
+                            pass
                         else:
                             unique_images = list(set(images))
                             is_first_image = True

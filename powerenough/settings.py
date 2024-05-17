@@ -29,7 +29,11 @@ SECRET_KEY = 'django-insecure-i#ru&j-n5)xp&ai%*$8uy6$!n)7e+cgehps-d8@o9)bcyh-@xm
 DEBUG = False
 
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+=======
+ALLOWED_HOSTS = ['.powerenough.in', '16.170.253.127']
+>>>>>>> 0e0f4a810001b6ee5712c36cf298676556690786
 
 
 
@@ -43,7 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'channels',
+=======
+    'channels'
+>>>>>>> 0e0f4a810001b6ee5712c36cf298676556690786
     'account',
     'powerenoughadmin',
     'store',
@@ -86,8 +94,11 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = 'powerenough.asgi.application'
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 0e0f4a810001b6ee5712c36cf298676556690786
 WSGI_APPLICATION = 'powerenough.wsgi.application'
 
 
@@ -99,6 +110,10 @@ CHANNEL_LAYERS = {
     },
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0e0f4a810001b6ee5712c36cf298676556690786
 
 
 # Database

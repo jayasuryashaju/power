@@ -26,9 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i#ru&j-n5)xp&ai%*$8uy6$!n)7e+cgehps-d8@o9)bcyh-@xm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+=======
+ALLOWED_HOSTS = ['.powerenough.in', '16.170.253.127']
+>>>>>>> 8cdfb8ad5a9a8bd702c3f587eb688bdd346a6c91
 
 
 # Application definition
@@ -41,7 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'channels',
+=======
+    'channels'
+>>>>>>> 8cdfb8ad5a9a8bd702c3f587eb688bdd346a6c91
     'account',
     'powerenoughadmin',
     'store',
@@ -84,8 +92,11 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = 'powerenough.asgi.application'
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 8cdfb8ad5a9a8bd702c3f587eb688bdd346a6c91
 WSGI_APPLICATION = 'powerenough.wsgi.application'
 
 
@@ -97,29 +108,21 @@ CHANNEL_LAYERS = {
     },
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8cdfb8ad5a9a8bd702c3f587eb688bdd346a6c91
 
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'power',
-        'USER': 'postgres',
-        'PASSWORD': '9847227810',
-        'HOST': 'localhost',  
-        'PORT': '5432',       
-    }
-}
-
+     'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
+         'NAME': BASE_DIR / 'db.sqlite3',
+     }
+ }
 
 
 # Password validation
@@ -161,11 +164,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
 # Default primary key field type

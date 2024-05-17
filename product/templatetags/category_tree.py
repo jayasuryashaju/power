@@ -1,6 +1,6 @@
 from django import template
 from django.urls import reverse
-
+import locale
 
 register = template.Library()
 
@@ -16,3 +16,12 @@ def category_tree(context, category, separator=" > "):
         category_list.insert(0, category.name)
     return separator.join(category_list)
 
+@register.filter
+def inr_format(value):
+    try:
+        # Set locale to Indian English for currency formatting
+        locale.setlocale(locale.LC_ALL, 'en_IN.UTF-8')
+        value = float(value)
+        return locale.format_string("₹%.2f", value, grouping=True)
+    except (ValueError, TypeError):
+        return value

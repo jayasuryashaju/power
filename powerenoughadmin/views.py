@@ -26,6 +26,11 @@ from io import BytesIO
 import os
 from django.db.utils import IntegrityError
 from urllib.error import URLError
+import random
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+
 
 
 
@@ -426,6 +431,51 @@ def download_image(image_url):
         return None
     
 
+# def download_image(image_url):
+#     try:
+#         # Determine the file extension
+#         extensions = ['.jpeg', '.jpg', '.png']
+#         extension = None
+#         for ext in extensions:
+#             if ext in image_url:
+#                 extension = ext
+#                 break
+
+#         # Handle the case where no known extension is found
+#         if not extension:
+#             raise ValueError(f"Unsupported image extension in URL: {image_url}")
+
+#         # Strip the last section after the found extension
+#         image_url = image_url.split(extension)[0] + extension
+
+#         # Download the image
+#         filename, headers = urlretrieve(image_url)
+#         with open(filename, 'rb') as file:
+#             image_content = BytesIO(file.read())
+
+#         # Get the filename from the URL
+#         filename = os.path.basename(image_url)
+
+#         # Create a Django File object from the image content
+#         image_file = File(image_content, name=filename)
+#         return image_file
+#     except (URLError, FileNotFoundError, ValueError) as e:
+#         # Handle errors during image download
+#         print(f"Error downloading image from {image_url}: {e}")
+#         return None
+
+def send_progress_update(progress, message, status):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "import_progress",
+        {
+            "type": "send_progress",
+            "progress": progress,
+            "message": message,
+            "status": status,
+        }
+    )
+
 def import_products(request):
     if request.method == 'POST':
         form = ImportCSVForm(request.POST, request.FILES)
@@ -433,97 +483,82 @@ def import_products(request):
             csv_file = request.FILES['csv_file']
             df = pd.read_csv(csv_file)
 
+            total_rows = len(df)
+            processed_rows = 0
+
             for index, row in df.iterrows():
-                if not pd.isna(row['Product Name']):  # Skip rows where 'Product Name' is NaN
+                if not pd.isna(row['Product Name']):
                     try:
-                        # Check if the vendor exists, if not create it
-                        vendor_name = row['Vendor']
+                        vendor_name = row['Product Name'].split()[0]
                         vendor, created = Vendor.objects.get_or_create(name=vendor_name)
 
-                        # Check if the category exists, if not create it
                         category_name = row['Category']
                         category, created = Category.objects.get_or_create(name=category_name)
 
-                        # # Handle NaN values in prices
-                        # new_price = row['New Price']
-                        # old_price = row['Old Price']
-                        # if pd.isna(new_price) and pd.isna(old_price):
-                        #     price = 0.00
-                        #     has_offer = False
-                        #     offer_price = None
-                        # else:
-                        #     if pd.notna(old_price):
-                        #         price = old_price
-                        #         if pd.notna(new_price):
-                        #             has_offer = True
-                        #             offer_price = new_price
-                        #         else:
-                        #             has_offer = False
-                        #             offer_price = None
-                        #     else:
-                        #         price = new_price
-                        #         has_offer = False
-                        #         offer_price = None
-                        price = 100
-                        has_offer = False
-                        offer_price = None
+                        price = row['Price']
+                        if pd.isna(price) or not isinstance(price, (int, float)):
+                            price = 0.0
+                        else:
+                            price = float(price)
 
-                        # Create the product
+                        product_name = row['Product Name']
+                        while Product.objects.filter(name=product_name).exists():
+                            product_name = f"{row['Product Name']}_{random.randint(1000, 9999)}"
+
                         product = Product.objects.create(
-                            name=row['Product Name'],
+                            name=product_name,
                             category=category,
                             vendor=vendor,
                             description=row['Description'],
-                            # additional_description=row['Additional Description'],
                             price=price,
-                            has_offer=has_offer,
-                            offer_price=offer_price
+                            has_offer=False,
+                            offer_price=None
                         )
 
-                        # Download and associate images
-                        images = eval(row['Images'])  # Convert string representation to list
-                        is_first_image = True  # Flag to track the first image
-                        for i, image_url in enumerate(images):
-                            # Download the image and create a File object
-                            image_file = download_image(image_url)
-
-                            if image_file is not None:
-                                # Set is_featured to True for the first image
-                                is_featured = is_first_image
-                                is_first_image = False
-
-                                # Create a ProductImage object
-                                product_image = ProductImage.objects.create(
+                        images = eval(row['Images']) if 'Images' in row and row['Images'] else []
+                        if not images:
+                            dummy_image_path = os.path.join('static', 'images', 'dummy_helmet.jpg')
+                            with open(dummy_image_path, 'rb') as dummy_file:
+                                dummy_image_content = BytesIO(dummy_file.read())
+                                dummy_image_file = File(dummy_image_content, name='dummy_helmet.jpg')
+                                ProductImage.objects.create(
                                     product=product,
-                                    image=image_file,  # Pass the File object to the image field
-                                    is_featured=is_featured  # Set is_featured field
-                                    # Add more fields as needed
+                                    image=dummy_image_file,
+                                    is_featured=True
                                 )
-                            else:
-                                # Skip this image and continue to the next one
-                                continue
+                        else:
+                            unique_images = list(set(images))
+                            is_first_image = True
+                            for image_url in unique_images:
+                                image_file = download_image(image_url)
+                                if image_file is not None:
+                                    is_featured = is_first_image
+                                    is_first_image = False
+                                    ProductImage.objects.create(
+                                        product=product,
+                                        image=image_file,
+                                        is_featured=is_featured
+                                    )
 
-                        # Add variations
                         variations = []
-                        if 'Sizes SKUs' in row:
-                            sizes_skus_data = eval(row['Sizes SKUs'])  # Assuming 'Sizes SKUs' column contains variation data
+                        if 'Sizes_SKUs' in row:
+                            sizes_skus_data = eval(row['Sizes_SKUs'])
                             for size, sku in sizes_skus_data.items():
                                 variation = Variation(
                                     product=product,
                                     size=size,
                                     sku=sku,
-                                    stock=10  # Set initial stock, adjust as needed
-                                    # Add more variation fields as needed
+                                    stock=10
                                 )
                                 variations.append(variation)
                         Variation.objects.bulk_create(variations)
 
-                        # After adding each product, you can print a message
-                        print(f"Product {row['Product Name']} added successfully")
+                        processed_rows += 1
+                        progress = int((processed_rows / total_rows) * 100)
+                        send_progress_update(progress, f"Product {product_name} added successfully", "success")
 
-                    except IntegrityError:
-                        # Handle the case where a product with the same name already exists
-                        print(f"Product {row['Product Name']} already exists. Skipping...")
+                    except IntegrityError as e:
+                        send_progress_update(progress, f"Failed to add product {row['Product Name']}: {e}", "error")
 
             return JsonResponse({'success': True, 'message': 'Products added successfully'})
     else:

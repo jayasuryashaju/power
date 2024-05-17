@@ -133,12 +133,13 @@
 
                             <div class="product-price" id="product-price">
                                 {% if product.has_offer %}
-                                    <span class="old-price">${{ product.price }}</span>
-                                    <span class="new-price">${{ product.offer_price }}</span>
+                                    <span class="old-price">{{ product.price|inr_format }}</span>
+                                    <span class="new-price">{{ product.offer_price|inr_format }}</span>
                                 {% else %}
-                                    <span>${{ product.price }}</span>
+                                    <span>{{ product.price|inr_format }}</span>
                                 {% endif %}
                             </div>
+                            
                             
 
                             <div class="product-content">

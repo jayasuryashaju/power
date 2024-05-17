@@ -20,3 +20,5 @@ media/
 # Ignore cache files
 __pycache__/
 
+#settings.py
+*settings.py

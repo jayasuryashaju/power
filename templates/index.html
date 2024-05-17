@@ -3,6 +3,7 @@
 {% load category_tree %}
 
 
+
 {% block title %}Power Enough Store.. {% endblock %}
 {% block content %}
 
@@ -348,11 +349,10 @@ p       overflow-x: hidden;
                                 <!-- End .product-title -->
                                 <div class="product-price">
                                     {% if product.has_offer %}
-                                        <span class="old-price">${{ product.price }}</span>
-                                        <span class="new-price">${{ product.offer_price }}</span>
-                                        
+                                        <span class="old-price">{{ product.price|inr_format }}</span>
+                                        <span class="new-price">{{ product.offer_price|inr_format }}</span>
                                     {% else %}
-                                        <span>${{ product.price }}</span>
+                                        <span>{{ product.price|inr_format }}</span>
                                     {% endif %}
                                 </div><!-- End .product-price -->
                             </div><!-- End .product-body -->
@@ -412,15 +412,14 @@ p       overflow-x: hidden;
                                 <div class="product-body">
                                     <h3 class="product-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
                                     <!-- End .product-title -->
-                                        <div class="product-price">
-                                            {% if product.has_offer %}
-                                                <span class="old-price">${{ product.price }}</span>
-                                                <span class="new-price">${{ product.offer_price }}</span>
-                                                
-                                            {% else %}
-                                                <span>${{ product.price }}</span>
-                                            {% endif %}
-                                        </div><!-- End .product-price -->
+                                    <div class="product-price">
+                                        {% if product.has_offer %}
+                                            <span class="old-price">{{ product.price|inr_format }}</span>
+                                            <span class="new-price">{{ product.offer_price|inr_format }}</span>
+                                        {% else %}
+                                            <span>{{ product.price|inr_format }}</span>
+                                        {% endif %}
+                                    </div><!-- End .product-price -->
 
                                     <div class="ratings-container">
                                         <div class="ratings">

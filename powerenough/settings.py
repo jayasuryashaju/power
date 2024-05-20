@@ -86,7 +86,6 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = 'powerenough.asgi.application'
-<<<<<<< HEAD
 
 
 
